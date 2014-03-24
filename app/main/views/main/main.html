@@ -1,8 +1,48 @@
 <:Title>
-  {#template main_path, "title", {controller_group: 'main'}}
+  Volt • TodoMVC
 
 <:Body>
-  <div class="container">
+  <section id='todoapp'>
+    <header id='header'>
+      <h1>todos</h1>
+      <form e-submit="add_todo">
+        <input autofocus id='new-todo' placeholder='What needs to be done?' value="{_new_todo}">
+      </form>
+    </header>
+    <section id='main'>
+      <input id='toggle-all' type='checkbox'/>
+      <label for='toggle-all'>Mark all as complete</label>
+      <ul id='todo-list'>
+        {#each _todos as todo}
+          <li>
+            <div class="view">
+              <input class="toggle" type="checkbox" checked="{todo._completed}"/>
+              <label>{todo._title}</label>
+              <button class="destroy" e-click="remove_todo(index)"/>
+            </div>
+            <input class="edit" value="{todo._title}"/>
+          </li>
+        {/}
+      </ul>
+
+    </section>
+    <footer id='footer'></footer>
+  </section>
+  <footer id='info'>
+    <p>Double-click to edit a todo</p>
+    <p>
+      Created by
+      <a href='https://github.com/elia'>Elia Schito</a>
+      with
+      <a href='http://voltframework.com'>Volt</a> and <a href="http://opalrb.org">Opal</a>
+    </p>
+    <p>
+      Part of
+      <a href='http://todomvc.com'>TodoMVC</a>
+    </p>
+  </footer>
+
+<!--   <div class="container">
     <div class="header">
       <ul class="nav nav-pills pull-right">
         <:nav href="/" text="Home" />
@@ -25,4 +65,6 @@
   <li class="{#if url.path.split('/')[1] == @href.split('/')[1]}active{/}">
     <a href="{@href}">{@text}</a>
   </li>
-
+      </!-- <:volt:notices /> --/>
+      </!-- {//#template main_path, 'body', {controller_group: 'main'}} --/>
+ -->

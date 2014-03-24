@@ -1,10 +1,19 @@
 class MainController < ModelController
   def index
     # Add code for when the index view is loaded
+    _todos << {_title: 'primo todo', _completed: false}
+    p _todos
   end
 
-  def about
-    # Add code for when the about view is loaded
+  def add_todo
+    _todos << {_title: self._new_todo.cur.to_s, _completed: false}
+    p _todos
+    self._new_todo = ''
+  end
+
+  def remove_todo index
+    _todos.delete_at index.cur
+    p [:remove_todo, index.cur]
   end
 
   private

@@ -110,8 +110,6 @@ GEM
       thor (~> 0.18.0)
       uglifier (~> 2.4.0)
       yui-compressor (~> 0.12.0)
-    volt-bootstrap (0.0.3)
-    volt-bootstrap-jumbotron-theme (0.0.3)
     websocket-driver (0.3.2)
     yui-compressor (0.12.0)
 
@@ -126,5 +124,3 @@ DEPENDENCIES
   sockjs!
   thin (~> 1.6.0)
   volt (= 0.7.13)
-  volt-bootstrap
-  volt-bootstrap-jumbotron-theme
