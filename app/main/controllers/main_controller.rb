@@ -21,6 +21,12 @@ class MainController < ModelController
     end
   end
 
+  def local_store
+    $page.local_store
+  end
+
+
+
   def index
     p :asdf
     _all_checked.on :change do |change|
