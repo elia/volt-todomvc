@@ -45,11 +45,13 @@ class MainController < ModelController
   end
 
   def _active_count
-    _todos.with{|todos| todos.cur.to_a.reject{|t| t._completed.true?}.size }
+    # _todos.with{|todos| todos.cur.to_a.reject{|t| t[:_completed]}.size }
+    _todos.count{|t| not(t._completed?.cur) }
   end
 
   def _completed_count
-    _todos.with{|todos| todos.cur.to_a.select{|t| t._completed.true?}.size }
+    # _todos.with{|todos| todos.cur.to_a.select{|t| t[:_completed]}.size }
+    _todos.count{|t| t._completed? }
   end
 
   def _all_count
