@@ -14,7 +14,7 @@
       <label for='toggle-all'>Mark all as complete</label>
       <ul id='todo-list'>
         {#each _todos as todo}
-          <li>
+          <li class="{#if todo._completed}completed{/}">
             <div class="view">
               <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
               <label>{todo._title}</label>
@@ -26,7 +26,32 @@
       </ul>
 
     </section>
-    <footer id='footer'></footer>
+    <footer id='footer'>
+      <span id='todo-count'>
+        <strong>{_active_count}</strong>
+        item{#if _active_count.cur != 1}s{/}
+        left
+      </span>
+
+      <ul id='filters'>
+        <li>
+          <a href='#/'>All</a>
+        </li>
+        <li>
+          <a href='#/active'>Active</a>
+        </li>
+        <li>
+          <a href='#/completed'>Completed</a>
+        </li>
+      </ul>
+
+      {#if _show_completed?}
+        <button id='clear-completed' e-click="clear_completed">
+          Clear completed ({_completed_count})
+        </button>
+      {/}
+
+    </footer>
   </section>
   <footer id='info'>
     <p>Double-click to edit a todo</p>
@@ -41,6 +66,7 @@
       <a href='http://todomvc.com'>TodoMVC</a>
     </p>
   </footer>
+
 
 <!--   <div class="container">
     <div class="header">

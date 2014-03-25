@@ -25,10 +25,7 @@ class MainController < ModelController
     $page.local_store
   end
 
-
-
   def index
-    p :asdf
     _all_checked.on :change do |change|
       p [:_all_checked, :change, change]
     end
@@ -36,15 +33,38 @@ class MainController < ModelController
     _todos.on :change do |todos|
       p [:_todos, :change, todos]
     end
+    p _completed_count.inspect
+  end
+
+  def _show_completed?
+    _completed_count.with{|c| c.cur > 0}
+  end
+
+  def clear_completed
+    _todos.delete_if { |todo| todo._completed.true?.cur }
+  end
+
+  def _active_count
+    _todos.with{|todos| todos.cur.to_a.reject{|t| t._completed.true?}.size }
+  end
+
+  def _completed_count
+    _todos.with{|todos| todos.cur.to_a.select{|t| t._completed.true?}.size }
+  end
+
+  def _all_count
+    _todos.with{|todos| todos.cur.size}
   end
 
   def add_todo
     _todos << {_title: self._new_todo.cur.to_s, _completed: false}
     self._new_todo = ''
+    _todos.trigger(:change)
   end
 
   def remove_todo index
     _todos.delete_at index.cur
+    _todos.trigger(:change)
   end
 
   def update_check_all
@@ -53,9 +73,9 @@ class MainController < ModelController
   end
 
   def check_all
-    p :check_all, _all_checked.cur
     check_all = _all_checked.true?
     _todos.each{|t| t._completed = check_all}
+    _todos.trigger(:change)
   end
 
   private
