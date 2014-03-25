@@ -10,13 +10,13 @@
       </form>
     </header>
     <section id='main'>
-      <input id='toggle-all' type='checkbox'/>
+      <input id='toggle-all' type='checkbox' e-change="check_all" checked="{_all_checked}"/>
       <label for='toggle-all'>Mark all as complete</label>
       <ul id='todo-list'>
         {#each _todos as todo}
           <li>
             <div class="view">
-              <input class="toggle" type="checkbox" checked="{todo._completed}"/>
+              <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
               <label>{todo._title}</label>
               <button class="destroy" e-click="remove_todo(index)"/>
             </div>
