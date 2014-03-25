@@ -1,7 +1,25 @@
 require 'pp'
 
 class MainController < ModelController
-  model $page.local_store
+  model :local_store
+
+  def model=(val)
+    # Start with a nil reactive value.
+    @model ||= ReactiveValue.new(Proc.new { nil })
+
+    if Symbol === val || String === val
+      collections = [:page, :store, :params, :controller, :local_store]
+      if collections.include?(val.to_sym)
+        @model.cur = self.send(val).cur
+      else
+        raise "#{val} is not the name of a valid model, choose from: #{collections.join(', ')}"
+      end
+    elsif val
+      @model.cur = val.cur
+    else
+      raise "model can not be #{val.inspect}"
+    end
+  end
 
   def index
     p :asdf
