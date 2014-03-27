@@ -1,14 +1,14 @@
 require 'pp'
 
-class MainController < ModelController
-  model :local_store
+ModelController.class_eval do
+  COLLECTIONS = [:page, :store, :params, :controller, :local_store]
 
   def model=(val)
     # Start with a nil reactive value.
     @model ||= ReactiveValue.new(Proc.new { nil })
+    collections = COLLECTIONS
 
     if Symbol === val || String === val
-      collections = [:page, :store, :params, :controller, :local_store]
       if collections.include?(val.to_sym)
         @model.cur = self.send(val).cur
       else
@@ -24,34 +24,59 @@ class MainController < ModelController
   def local_store
     $page.local_store
   end
+end
 
-  def index
-    _all_checked.on :change do |change|
-      p [:_all_checked, :change, change]
-    end
+class MainController < ModelController
+  model :local_store
+  ESCAPE_KEY = 27
 
-    _todos.on :change do |todos|
-      p [:_todos, :change, todos]
-    end
-    p _completed_count.inspect
+  def show_completed?
+    _completed_count > 0
   end
 
-  def _show_completed?
-    _completed_count.with{|c| c.cur > 0}
+  def _current_filter
+    page._current_filter
   end
 
   def clear_completed
-    _todos.delete_if { |todo| todo._completed.true?.cur }
+    completed = []
+    _todos.each { |todo| completed << todo if todo._completed.cur }
+    _todos.delete *completed
+  end
+
+  def update_filter(filter)
+    page._current_filter.cur = filter;
+    _todos.trigger! :changed
   end
 
   def _active_count
-    # _todos.with{|todos| todos.cur.to_a.reject{|t| t[:_completed]}.size }
-    _todos.count{|t| not(t._completed?.cur) }
+    _todos.count{|t| t._completed.nil? }
   end
 
   def _completed_count
-    # _todos.with{|todos| todos.cur.to_a.select{|t| t[:_completed]}.size }
-    _todos.count{|t| t._completed? }
+    _todos.count{|t| t._completed.true? }
+  end
+
+  def _todos
+    @todos ||= begin
+      todos = model._todos
+      if todos.nil?.cur
+        todos << {_title: :temp}
+        todos.delete_at(0)
+      else
+        todos.map! do |todo|
+          p [todo]
+          p [todo.to_h]
+          todo = Todo.new(todo.to_h)
+          p [:modelled, todo]
+          todo.on :changed do
+            todos.trigger! :changed
+          end
+          todo
+        end
+      end
+      todos
+    end
   end
 
   def _all_count
@@ -59,14 +84,31 @@ class MainController < ModelController
   end
 
   def add_todo
-    _todos << {_title: self._new_todo.cur.to_s, _completed: false}
+    _todos << Todo.new(_title: _new_todo.cur.to_s, _completed: false)
     self._new_todo = ''
-    _todos.trigger(:change)
   end
 
   def remove_todo index
     _todos.delete_at index.cur
-    _todos.trigger(:change)
+  end
+
+  def edit(todo)
+    _todos.each {|t| t._editing = false}
+    page._new_title = ''
+    page._editing = todo
+  end
+
+  def cancel_edit(todo)
+    page._editing = nil
+  end
+
+  def save_edit(todo)
+    todo._title = page._new_title
+    page._editing = nil
+  end
+
+  def editing?(todo)
+    page._editing == todo
   end
 
   def update_check_all
@@ -77,7 +119,6 @@ class MainController < ModelController
   def check_all
     check_all = _all_checked.true?
     _todos.each{|t| t._completed = check_all}
-    _todos.trigger(:change)
   end
 
   private

@@ -2,10 +2,10 @@
   Volt • TodoMVC
 
 <:Body>
-  <section id='todoapp'>
+  <section id='todoapp' e-click="cancel_edit">
     <header id='header'>
       <h1>todos</h1>
-      <form e-submit="add_todo">
+      <form e-submit="add_todo" autocomplete="off">
         <input autofocus id='new-todo' placeholder='What needs to be done?' value="{_new_todo}">
       </form>
     </header>
@@ -14,14 +14,18 @@
       <label for='toggle-all'>Mark all as complete</label>
       <ul id='todo-list'>
         {#each _todos as todo}
-          <li class="{#if todo._completed}completed{/}">
-            <div class="view">
-              <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
-              <label>{todo._title}</label>
-              <button class="destroy" e-click="remove_todo(index)"/>
-            </div>
-            <input class="edit" value="{todo._title}"/>
-          </li>
+          {#if todo.visible_for?(page._current_filter)}
+            <li class="{#if todo._completed}completed{/} {#if editing?(todo)}editing{/}">
+              <div class="view" e-dblclick="edit(todo)">
+                <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
+                <label>{todo._title}</label>
+                <button class="destroy" e-click="remove_todo(index)"/>
+              </div>
+              <form e-submit="save_edit(todo)">
+                <input class="edit" value="{page._new_title}"/>
+              </form>
+            </li>
+          {/}
         {/}
       </ul>
 
@@ -29,23 +33,17 @@
     <footer id='footer'>
       <span id='todo-count'>
         <strong>{_active_count}</strong>
-        item{#if _active_count.cur != 1}s{/}
+        item{#if _active_count != 1}s{/}
         left
       </span>
 
       <ul id='filters'>
-        <li>
-          <a href='#/'>All</a>
-        </li>
-        <li>
-          <a href='#/active'>Active</a>
-        </li>
-        <li>
-          <a href='#/completed'>Completed</a>
-        </li>
+        <:nav delegate="{self}" href="" text="All">
+        <:nav delegate="{self}" href="active" text="Active">
+        <:nav delegate="{self}" href="completed" text="Completed">
       </ul>
 
-      {#if _show_completed?}
+      {#if _completed_count > 0}
         <button id='clear-completed' e-click="clear_completed">
           Clear completed ({_completed_count})
         </button>
@@ -66,6 +64,17 @@
       <a href='http://todomvc.com'>TodoMVC</a>
     </p>
   </footer>
+
+
+<:Nav>
+  <li>
+    <a e-click="@delegate.update_filter(@href)" class="{#if page._current_filter == @href}selected{/}">
+      {@text}
+    </a>
+    <!-- <a href="#{@href}" e-click="self._current_filter.cur = @href">{@text}</a> -->
+    <!-- <a href="#{@href}">{@text}</a> -->
+    <!-- <a e-click="filter_todos(@href)">{@text}</a> -->
+  </li>
 
 
 <!--   <div class="container">

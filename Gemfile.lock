@@ -98,7 +98,7 @@ GEM
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    volt (0.7.13)
+    volt (0.7.14)
       listen (~> 2.4.0)
       mongo (~> 1.9.0)
       pry (~> 0.9.12.0)
@@ -123,4 +123,4 @@ DEPENDENCIES
   opal-jquery!
   sockjs!
   thin (~> 1.6.0)
-  volt (= 0.7.13)
+  volt (= 0.7.14)
