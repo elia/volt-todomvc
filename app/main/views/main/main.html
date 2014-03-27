@@ -19,7 +19,7 @@
               <div class="view" e-dblclick="edit(todo)">
                 <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
                 <label>{todo._title}</label>
-                <button class="destroy" e-click="remove_todo(index)"/>
+                <button class="destroy" e-click="remove_todo(todo.id)"/>
               </div>
               <form e-submit="save_edit(todo)">
                 <input class="edit" value="{page._new_title}"/>

@@ -39,9 +39,7 @@ class MainController < ModelController
   end
 
   def clear_completed
-    completed = []
-    _todos.each { |todo| completed << todo if todo._completed.cur }
-    _todos.delete *completed
+    self._todos.cur = _todos.reject {|t| t.completed?}.cur
   end
 
   def update_filter(filter)
@@ -65,10 +63,7 @@ class MainController < ModelController
         todos.delete_at(0)
       else
         todos.map! do |todo|
-          p [todo]
-          p [todo.to_h]
           todo = Todo.new(todo.to_h)
-          p [:modelled, todo]
           todo.on :changed do
             todos.trigger! :changed
           end
@@ -88,8 +83,8 @@ class MainController < ModelController
     self._new_todo = ''
   end
 
-  def remove_todo index
-    _todos.delete_at index.cur
+  def remove_todo id
+    _todos.remove id
   end
 
   def edit(todo)
