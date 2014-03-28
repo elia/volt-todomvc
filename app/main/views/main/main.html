@@ -19,7 +19,7 @@
               <div class="view" e-dblclick="edit(todo)">
                 <input class="toggle" type="checkbox" e-change="update_check_all" checked="{todo._completed}"/>
                 <label>{todo._title}</label>
-                <button class="destroy" e-click="remove_todo(todo.id)"/>
+                <button class="destroy" e-click="remove_todo(todo)"/>
               </div>
               <form e-submit="save_edit(todo)">
                 <input class="edit" value="{page._new_title}"/>
@@ -68,12 +68,9 @@
 
 <:Nav>
   <li>
-    <a e-click="@delegate.update_filter(@href)" class="{#if page._current_filter == @href}selected{/}">
+    <a e-click="@delegate.update_filter(@href)" class="{#if url.fragment == @href}selected{/}">
       {@text}
     </a>
-    <!-- <a href="#{@href}" e-click="self._current_filter.cur = @href">{@text}</a> -->
-    <!-- <a href="#{@href}">{@text}</a> -->
-    <!-- <a e-click="filter_todos(@href)">{@text}</a> -->
   </li>
 
 

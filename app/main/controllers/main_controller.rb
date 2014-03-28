@@ -26,6 +26,10 @@ ModelController.class_eval do
   end
 end
 
+class URL
+  attr_reader :fragment
+end
+
 class MainController < ModelController
   model :local_store
   ESCAPE_KEY = 27
@@ -35,7 +39,15 @@ class MainController < ModelController
   end
 
   def _current_filter
-    page._current_filter
+    @_current_filter ||= ReactiveValue.new(url.fragment)
+  end
+
+  def initialize *args, &block
+    super
+    _current_filter.on :changed do |val|
+      p [:fragment, val]
+      update_filter(val.cur)
+    end
   end
 
   def clear_completed
@@ -43,7 +55,8 @@ class MainController < ModelController
   end
 
   def update_filter(filter)
-    page._current_filter.cur = filter;
+    _current_filter.cur = filter;
+    go filter.cur.to_s == '' ? '' : '#'+filter
     _todos.trigger! :changed
   end
 
@@ -62,13 +75,7 @@ class MainController < ModelController
         todos << {_title: :temp}
         todos.delete_at(0)
       else
-        todos.map! do |todo|
-          todo = Todo.new(todo.to_h)
-          todo.on :changed do
-            todos.trigger! :changed
-          end
-          todo
-        end
+        todos.map!{|t| Todo.new(t.to_h)}
       end
       todos
     end
@@ -83,8 +90,8 @@ class MainController < ModelController
     self._new_todo = ''
   end
 
-  def remove_todo id
-    _todos.remove id
+  def remove_todo todo
+    _todos.delete todo
   end
 
   def edit(todo)
